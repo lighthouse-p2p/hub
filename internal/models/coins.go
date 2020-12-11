@@ -82,7 +82,7 @@ func AddBlock(cfg *config.Config, pubKey string, txn float64) error {
 			return tx.Error
 		}
 	} else {
-		lastBlock.TotalCoins = lastBlockForPubKey.TotalCoins + txn
+		newBlock.TotalCoins = lastBlockForPubKey.TotalCoins + txn
 	}
 
 	newBlock.PubKey = pubKey
