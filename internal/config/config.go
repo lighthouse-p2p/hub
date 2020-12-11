@@ -21,9 +21,19 @@ type Config struct {
 		Timezone string
 		GormDSN  string
 	}
+
 	HTTPConfig struct {
 		HTTPAddr      string
 		SignalingAddr string
+	}
+
+	// ChainConfig is hardncoded for now
+	ChainConfig struct {
+		// Worth is the value of coins per mb
+		Worth float64
+
+		// InitialCoins is the number of coins initially given to the user while registration
+		InitialCoins float64
 	}
 }
 
@@ -91,6 +101,9 @@ func (c *Config) LoadConfig() {
 
 	c.HTTPConfig.HTTPAddr = httpAddr
 	c.HTTPConfig.SignalingAddr = signalingAddr
+
+	c.ChainConfig.InitialCoins = 100
+	c.ChainConfig.Worth = 1
 
 	log.Println("Config loaded successfully")
 }
