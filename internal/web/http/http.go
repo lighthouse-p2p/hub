@@ -26,6 +26,7 @@ func InitHTTP(cfg *config.Config) {
 
 	v1Group := app.Group("/v1")
 	v1Group.Post("/register", handlersInit.Register)
+	v1Group.Get("/resolve/:nickname", handlersInit.ResolveNickName)
 
 	go log.Fatal(app.Listen(addr))
 	log.Println("HTTP server is up!")
