@@ -124,7 +124,7 @@ func (h *Handlers) Signaling(c *websocket.Conn) {
 			}
 
 			channel := getRedisPSKey(signal.To)
-			h.Cfg.Redis.Publish(context.Background(), channel, signal.SDP)
+			h.Cfg.Redis.Publish(context.Background(), channel, string(msg))
 
 			break
 
