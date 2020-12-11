@@ -3,6 +3,7 @@ package database
 import (
 	"log"
 
+	"github.com/lighthouse-p2p/hub/internal/models"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -16,6 +17,7 @@ func Connect(dsn string) (*gorm.DB, error) {
 		return nil, err
 	}
 
+	db.AutoMigrate(&models.DHT{}, &models.CoinChain{})
 	log.Println("Connected to the database!")
 
 	return db, nil
