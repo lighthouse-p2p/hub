@@ -20,7 +20,5 @@ func (h *Handlers) ResolveNickName(ctx *fiber.Ctx) error {
 		return ctx.Status(404).SendString("Not Found")
 	}
 
-	return ctx.JSON(&models.ResolveReponse{
-		PubKey: record.PubKey,
-	})
+	return ctx.SendString(record.PubKey)
 }

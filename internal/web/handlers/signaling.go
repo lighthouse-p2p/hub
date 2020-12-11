@@ -2,9 +2,11 @@ package handlers
 
 import (
 	"encoding/base64"
+	"fmt"
 	"log"
 
 	"github.com/gofiber/websocket/v2"
+	"github.com/gomodule/redigo/redis"
 	"github.com/lighthouse-p2p/hub/internal/models"
 	"github.com/lighthouse-p2p/hub/internal/utils"
 	"golang.org/x/crypto/nacl/sign"
@@ -67,6 +69,8 @@ func (h *Handlers) Signaling(c *websocket.Conn) {
 	c.WriteMessage(1, []byte(challange))
 	socketState = codeSentState
 
+	var pubSubConn redis.PubSubConn
+
 	var (
 		// mt is the message type
 		// noFrame = -1, TextMessage = 1, BinaryMessage = 2
@@ -91,7 +95,39 @@ func (h *Handlers) Signaling(c *websocket.Conn) {
 
 				return
 			}
+
+			redisPoolConn := h.Cfg.Redis.Pool.Get()
+			pubSubConn = redis.PubSubConn{Conn: redisPoolConn}
+
+			if err := pubSubConn.PSubscribe(getRedisPSKey(pubKey)); err != nil {
+				log.Printf("Redis error: %s", err)
+
+				c.Close()
+				return
+			}
+
+			go func() {
+				for {
+					switch v := pubSubConn.Receive().(type) {
+					case redis.Message:
+						c.WriteMessage(1, v.Data)
+					}
+				}
+			}()
+
+			c.SetCloseHandler(func(code int, msg string) error {
+				go log.Println("Bye")
+				go pubSubConn.Close()
+
+				return nil
+			})
+
 			c.WriteMessage(1, []byte("OK"))
+
+			if err != nil {
+				log.Fatalln(err)
+			}
+
 			socketState = authenticatedState
 
 			break
@@ -103,4 +139,8 @@ func (h *Handlers) Signaling(c *websocket.Conn) {
 			break
 		}
 	}
+}
+
+func getRedisPSKey(pubKey string) string {
+	return fmt.Sprintf("sps_%s", pubKey)
 }
