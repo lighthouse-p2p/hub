@@ -3,6 +3,7 @@ package handlers
 import (
 	"context"
 	"encoding/base64"
+	"encoding/json"
 	"fmt"
 	"log"
 
@@ -73,19 +74,14 @@ func (h *Handlers) Signaling(c *websocket.Conn) {
 	var (
 		// mt is the message type
 		// noFrame = -1, TextMessage = 1, BinaryMessage = 2
-		mt  int
 		msg []byte
 	)
 
 	var pubsub *redis.PubSub
 
 	for {
-		if mt, msg, err = c.ReadMessage(); err != nil {
+		if _, msg, err = c.ReadMessage(); err != nil {
 			break
-		}
-
-		if mt != 2 {
-			continue
 		}
 
 		switch socketState {
@@ -117,6 +113,19 @@ func (h *Handlers) Signaling(c *websocket.Conn) {
 			break
 
 		case authenticatedState:
+			if _, msg, err = c.ReadMessage(); err != nil {
+				break
+			}
+
+			var signal models.Signal
+			err = json.Unmarshal(msg, &signal)
+			if err != nil || signal.To == "" {
+				continue
+			}
+
+			channel := getRedisPSKey(signal.To)
+			h.Cfg.Redis.Publish(context.Background(), channel, signal.SDP)
+
 			break
 
 		default:
