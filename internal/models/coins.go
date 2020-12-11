@@ -15,7 +15,7 @@ type CoinBlock struct {
 	gorm.Model
 
 	// PubKey is the public key of the peer
-	PubKey string
+	PubKey string `gorm:"index"`
 
 	// TotalCoins is the number of coins the peer has after the txn
 	TotalCoins float64
