@@ -9,8 +9,8 @@ import (
 	"gorm.io/gorm"
 )
 
-// CoinChain the the coin blockchain stored onto a psql DB for now
-type CoinChain struct {
+// CoinBlock the the coin blockchain stored onto a psql DB for now
+type CoinBlock struct {
 	gorm.Model
 
 	// PubKey is the public key of the peer
@@ -38,10 +38,10 @@ type CoinPack struct {
 func AddBlock(cfg *config.Config, pubKey string, txn float64) error {
 	db := cfg.Database
 
-	newBlock := &CoinChain{}
+	newBlock := &CoinBlock{}
 
-	var lastBlock CoinChain
-	tx := db.Model(&CoinChain{}).Last(lastBlock)
+	var lastBlock CoinBlock
+	tx := db.Model(&CoinBlock{}).Last(lastBlock)
 	if tx.Error != nil {
 		if errors.Is(tx.Error, gorm.ErrRecordNotFound) {
 			// Handle record not found (first record)
@@ -73,8 +73,8 @@ func AddBlock(cfg *config.Config, pubKey string, txn float64) error {
 		newBlock.Hash = string(blake.Sum(nil))
 	}
 
-	var lastBlockForPubKey CoinChain
-	tx = db.Model(&CoinChain{}).Where("pubKey = ?", pubKey).Last(lastBlockForPubKey)
+	var lastBlockForPubKey CoinBlock
+	tx = db.Model(&CoinBlock{}).Where("pubKey = ?", pubKey).Last(lastBlockForPubKey)
 	if tx.Error != nil {
 		if errors.Is(tx.Error, gorm.ErrRecordNotFound) {
 			lastBlock.TotalCoins = txn

@@ -17,7 +17,7 @@ func Connect(dsn string) (*gorm.DB, error) {
 		return nil, err
 	}
 
-	db.AutoMigrate(&models.DHT{}, &models.CoinChain{})
+	db.AutoMigrate(&models.DHT{}, &models.CoinBlock{})
 	log.Println("Connected to the database!")
 
 	return db, nil
