@@ -1,4 +1,4 @@
-package http
+package web
 
 import (
 	"log"
@@ -7,7 +7,7 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/fiber/v2/middleware/recover"
 	"github.com/lighthouse-p2p/hub/internal/config"
-	"github.com/lighthouse-p2p/hub/internal/web/http/handlers"
+	"github.com/lighthouse-p2p/hub/internal/web/handlers"
 )
 
 // InitHTTP initializes the HTTP server on the given address
