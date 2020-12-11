@@ -4,6 +4,8 @@ import (
 	"log"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/logger"
+	"github.com/gofiber/fiber/v2/middleware/recover"
 	"github.com/lighthouse-p2p/hub/internal/config"
 	"github.com/lighthouse-p2p/hub/internal/web/http/handlers"
 )
@@ -16,6 +18,9 @@ func InitHTTP(cfg *config.Config) {
 	app := fiber.New(fiber.Config{
 		ServerHeader: "lighthousehub/fiber/1.0",
 	})
+
+	app.Use(logger.New())
+	app.Use(recover.New())
 
 	handlersInit := handlers.Handlers{Cfg: cfg}
 
