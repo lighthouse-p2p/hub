@@ -35,14 +35,13 @@ type CoinPack struct {
 }
 
 // AddBlock adds a new block to the coin chain
-func AddBlock(cfg *config.Config, pubKey string, totalCoins, txn float64) error {
+func AddBlock(cfg *config.Config, pubKey string, txn float64) error {
 	db := cfg.Database
 
 	newBlock := &CoinChain{}
 
 	var lastBlock CoinChain
 	tx := db.Model(&CoinChain{}).Last(lastBlock)
-
 	if tx.Error != nil {
 		if errors.Is(tx.Error, gorm.ErrRecordNotFound) {
 			// Handle record not found (first record)
@@ -74,8 +73,19 @@ func AddBlock(cfg *config.Config, pubKey string, totalCoins, txn float64) error 
 		newBlock.Hash = string(blake.Sum(nil))
 	}
 
+	var lastBlockForPubKey CoinChain
+	tx = db.Model(&CoinChain{}).Where("pubKey = ?", pubKey).Last(lastBlockForPubKey)
+	if tx.Error != nil {
+		if errors.Is(tx.Error, gorm.ErrRecordNotFound) {
+			lastBlock.TotalCoins = txn
+		} else {
+			return tx.Error
+		}
+	} else {
+		lastBlock.TotalCoins = lastBlockForPubKey.TotalCoins + txn
+	}
+
 	newBlock.PubKey = pubKey
-	newBlock.TotalCoins = totalCoins
 	newBlock.TXN = txn
 
 	tx = db.Create(&newBlock)
