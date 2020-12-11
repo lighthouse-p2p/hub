@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"time"
 
 	"github.com/go-redis/redis/v8"
 	"github.com/gofiber/websocket/v2"
@@ -100,6 +101,15 @@ func (h *Handlers) Signaling(c *websocket.Conn) {
 				}
 			}()
 
+			timer := time.NewTicker(5 * time.Second)
+			go func() {
+				for {
+					<-timer.C
+					pubsub.Ping(context.Background())
+				}
+			}()
+
+			defer timer.Stop()
 			defer pubsub.Unsubscribe(context.Background(), getRedisPSKey(pubKey))
 
 			c.WriteMessage(1, []byte("OK"))
@@ -113,10 +123,6 @@ func (h *Handlers) Signaling(c *websocket.Conn) {
 			break
 
 		case authenticatedState:
-			if _, msg, err = c.ReadMessage(); err != nil {
-				break
-			}
-
 			var signal models.Signal
 			err = json.Unmarshal(msg, &signal)
 			if err != nil || signal.To == "" {
