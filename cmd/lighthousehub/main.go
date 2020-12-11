@@ -20,16 +20,15 @@ func main() {
 	}
 	cfg.Database = db
 
-	redisPool, redisConn := redis.Connect(
+	redisConn := redis.Connect(
 		cfg.RedisConfig.Host,
 		cfg.RedisConfig.Port,
 		cfg.RedisConfig.User,
 		cfg.RedisConfig.Password,
 	)
-	cfg.Redis.Pool = redisPool
-	cfg.Redis.Conn = redisConn
+	cfg.Redis = redisConn
 
-	defer redis.Close(redisPool, redisConn)
+	defer redis.Close(redisConn)
 
 	web.InitHTTP(cfg)
 }

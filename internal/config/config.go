@@ -6,7 +6,7 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/gomodule/redigo/redis"
+	"github.com/go-redis/redis/v8"
 	"github.com/joho/godotenv"
 	"gorm.io/gorm"
 )
@@ -49,10 +49,7 @@ type Config struct {
 	Database *gorm.DB
 
 	// Redis holds the global redis pool and connection
-	Redis struct {
-		Pool *redis.Pool
-		Conn redis.Conn
-	}
+	Redis *redis.Client
 }
 
 // LoadConfig loads the config from the environment file
