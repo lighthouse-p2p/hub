@@ -4,6 +4,7 @@ go 1.15
 
 require (
 	github.com/gofiber/fiber/v2 v2.2.5
+	github.com/gomodule/redigo v1.8.3
 	github.com/joho/godotenv v1.3.0
 	github.com/vmihailenco/msgpack/v5 v5.1.0
 	golang.org/x/crypto v0.0.0-20200622213623-75b288015ac9

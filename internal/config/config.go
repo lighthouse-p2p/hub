@@ -6,6 +6,7 @@ import (
 	"os"
 	"strconv"
 
+	"github.com/gomodule/redigo/redis"
 	"github.com/joho/godotenv"
 	"gorm.io/gorm"
 )
@@ -26,6 +27,7 @@ type Config struct {
 	RedisConfig struct {
 		Host     string
 		Port     int
+		User     string
 		Password string
 	}
 
@@ -45,6 +47,12 @@ type Config struct {
 
 	// Database holds a gorm.DB instance for access with the handler
 	Database *gorm.DB
+
+	// Redis holds the global redis pool and connection
+	Redis struct {
+		Pool *redis.Pool
+		Conn redis.Conn
+	}
 }
 
 // LoadConfig loads the config from the environment file
@@ -66,6 +74,7 @@ func (c *Config) LoadConfig() {
 
 	redisHost, redisHostPresent := os.LookupEnv("REDIS_HOST")
 	redisPort, redisPortPresent := os.LookupEnv("REDIS_PORT")
+	redisUser, redisUserPresent := os.LookupEnv("REDIS_USER")
 	redisPassword, redisPasswordPresent := os.LookupEnv("REDIS_PASSWORD")
 
 	httpAddr, httpAddrPresent := os.LookupEnv("HTTP_ADDR")
@@ -82,6 +91,7 @@ func (c *Config) LoadConfig() {
 		!signalingAddrPresent ||
 		!redisHostPresent ||
 		!redisPortPresent ||
+		!redisUserPresent ||
 		!redisPasswordPresent {
 		log.Fatalln(".env is not complete :)")
 	}
@@ -121,6 +131,7 @@ func (c *Config) LoadConfig() {
 	if err != nil {
 		log.Fatalln("REDIS_PORT is not an integer")
 	}
+	c.RedisConfig.User = redisUser
 	c.RedisConfig.Password = redisPassword
 
 	c.HTTPConfig.HTTPAddr = httpAddr
