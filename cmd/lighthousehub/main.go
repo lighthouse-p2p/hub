@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/lighthouse-p2p/hub/internal/config"
 	"github.com/lighthouse-p2p/hub/internal/database"
+	"github.com/lighthouse-p2p/hub/internal/web/http"
 )
 
 func main() {
@@ -11,4 +12,5 @@ func main() {
 	config.SetConfig(cfg)
 
 	database.Connect(cfg.PostgresConfig.GormDSN)
+	http.InitHTTP(cfg)
 }
