@@ -6,6 +6,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/fiber/v2/middleware/recover"
+	"github.com/gofiber/websocket/v2"
 	"github.com/lighthouse-p2p/hub/internal/config"
 	"github.com/lighthouse-p2p/hub/internal/web/handlers"
 )
@@ -27,6 +28,16 @@ func InitHTTP(cfg *config.Config) {
 	v1Group := app.Group("/v1")
 	v1Group.Post("/register", handlersInit.Register)
 	v1Group.Get("/resolve/:nickname", handlersInit.ResolveNickName)
+
+	wsGroup := v1Group.Group("/ws")
+	wsGroup.Use("/", func(c *fiber.Ctx) error {
+		if websocket.IsWebSocketUpgrade(c) {
+			return c.Next()
+		}
+
+		return c.Status(400).SendString("Plain HTTP to websocket endpoint :(")
+	})
+	wsGroup.Get("/signaling", websocket.New(handlersInit.Signaling))
 
 	go log.Fatal(app.Listen(addr))
 	log.Println("HTTP server is up!")
