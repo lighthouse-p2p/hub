@@ -74,7 +74,7 @@ func AddBlock(cfg *config.Config, pubKey string, txn float64) error {
 	}
 
 	var lastBlockForPubKey CoinBlock
-	tx = db.Model(&CoinBlock{}).Where("pubKey = ?", pubKey).Last(lastBlockForPubKey)
+	tx = db.Model(&CoinBlock{}).Where("pub_key = ?", pubKey).Last(lastBlockForPubKey)
 	if tx.Error != nil {
 		if errors.Is(tx.Error, gorm.ErrRecordNotFound) {
 			lastBlock.TotalCoins = txn
