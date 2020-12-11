@@ -1,6 +1,7 @@
 package models
 
 import (
+	"encoding/base64"
 	"errors"
 
 	"github.com/lighthouse-p2p/hub/internal/config"
@@ -22,8 +23,8 @@ type CoinBlock struct {
 	// TXN is the amount added/reduced from the old `TotalCoins`
 	TXN float64
 
-	// Hash is the blake2 hash of the last node's msgpack in hex format
-	Hash string
+	// Hash is the blake2 hash of the last node's msgpack in base64
+	LastHash string
 }
 
 // CoinPack is used to pack a record into msgpack
@@ -31,7 +32,7 @@ type CoinPack struct {
 	PubKey     string  `msgpack:"public_key"`
 	TotalCoins float64 `msgpack:"total_coins"`
 	TXN        float64 `msgpack:"txn"`
-	Hash       string  `msgpack:"hash"`
+	LastHash   string  `msgpack:"hash"`
 }
 
 // AddBlock adds a new block to the coin chain
@@ -41,11 +42,11 @@ func AddBlock(cfg *config.Config, pubKey string, txn float64) error {
 	newBlock := &CoinBlock{}
 
 	var lastBlock CoinBlock
-	tx := db.Model(&CoinBlock{}).Last(lastBlock)
+	tx := db.Model(&CoinBlock{}).Last(&lastBlock)
 	if tx.Error != nil {
 		if errors.Is(tx.Error, gorm.ErrRecordNotFound) {
 			// Handle record not found (first record)
-			newBlock.Hash = ""
+			newBlock.LastHash = "init_block"
 		} else {
 			return tx.Error
 		}
@@ -54,7 +55,7 @@ func AddBlock(cfg *config.Config, pubKey string, txn float64) error {
 			PubKey:     lastBlock.PubKey,
 			TotalCoins: lastBlock.TotalCoins,
 			TXN:        lastBlock.TXN,
-			Hash:       lastBlock.Hash,
+			LastHash:   lastBlock.LastHash,
 		})
 		if err != nil {
 			return err
@@ -70,11 +71,11 @@ func AddBlock(cfg *config.Config, pubKey string, txn float64) error {
 			return err
 		}
 
-		newBlock.Hash = string(blake.Sum(nil))
+		newBlock.LastHash = base64.StdEncoding.EncodeToString(blake.Sum(nil))
 	}
 
 	var lastBlockForPubKey CoinBlock
-	tx = db.Model(&CoinBlock{}).Where("pub_key = ?", pubKey).Last(lastBlockForPubKey)
+	tx = db.Model(&CoinBlock{}).Where("pub_key = ?", pubKey).Last(&lastBlockForPubKey)
 	if tx.Error != nil {
 		if errors.Is(tx.Error, gorm.ErrRecordNotFound) {
 			newBlock.TotalCoins = txn
