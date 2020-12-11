@@ -25,5 +25,10 @@ func (h *Handlers) Register(ctx *fiber.Ctx) error {
 		return ctx.Status(409).SendString("Either the nickname, or the public key is already used")
 	}
 
+	err := models.AddBlock(h.Cfg, body.PubKey, 100, 100)
+	if err != nil {
+		return ctx.Status(500).SendString("Unable to add block :(")
+	}
+
 	return ctx.SendStatus(201)
 }
