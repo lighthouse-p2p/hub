@@ -7,6 +7,7 @@ import (
 	"strconv"
 
 	"github.com/joho/godotenv"
+	"gorm.io/gorm"
 )
 
 // Config holds the structure for the application config
@@ -35,6 +36,9 @@ type Config struct {
 		// InitialCoins is the number of coins initially given to the user while registration
 		InitialCoins float64
 	}
+
+	// Database holds a gorm.DB instance for access with the handler
+	Database *gorm.DB
 }
 
 // LoadConfig loads the config from the environment file
@@ -106,17 +110,4 @@ func (c *Config) LoadConfig() {
 	c.ChainConfig.Worth = 1
 
 	log.Println("Config loaded successfully")
-}
-
-// config holds a pointer to the global configutation
-var config *Config
-
-// SetConfig sets the global configuration
-func SetConfig(conf *Config) {
-	config = conf
-}
-
-// GetConfig fetches the global config
-func GetConfig() *Config {
-	return config
 }
