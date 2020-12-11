@@ -23,6 +23,12 @@ type Config struct {
 		GormDSN  string
 	}
 
+	RedisConfig struct {
+		Host     string
+		Port     int
+		Password string
+	}
+
 	HTTPConfig struct {
 		HTTPAddr      string
 		SignalingAddr string
@@ -58,6 +64,10 @@ func (c *Config) LoadConfig() {
 	pgTLS, pgTLSPresent := os.LookupEnv("POSTGRES_TLS")
 	pgTimezone, pgTimezonePresent := os.LookupEnv("POSTGRES_TIMEZONE")
 
+	redisHost, redisHostPresent := os.LookupEnv("REDIS_HOST")
+	redisPort, redisPortPresent := os.LookupEnv("REDIS_PORT")
+	redisPassword, redisPasswordPresent := os.LookupEnv("REDIS_PASSWORD")
+
 	httpAddr, httpAddrPresent := os.LookupEnv("HTTP_ADDR")
 	signalingAddr, signalingAddrPresent := os.LookupEnv("SIGNALING_ADDR")
 
@@ -69,7 +79,10 @@ func (c *Config) LoadConfig() {
 		!pgTLSPresent ||
 		!pgTimezonePresent ||
 		!httpAddrPresent ||
-		!signalingAddrPresent {
+		!signalingAddrPresent ||
+		!redisHostPresent ||
+		!redisPortPresent ||
+		!redisPasswordPresent {
 		log.Fatalln(".env is not complete :)")
 	}
 
@@ -102,6 +115,13 @@ func (c *Config) LoadConfig() {
 		sslMode,
 		pgTimezone,
 	)
+
+	c.RedisConfig.Host = redisHost
+	c.RedisConfig.Port, err = strconv.Atoi(redisPort)
+	if err != nil {
+		log.Fatalln("REDIS_PORT is not an integer")
+	}
+	c.RedisConfig.Password = redisPassword
 
 	c.HTTPConfig.HTTPAddr = httpAddr
 	c.HTTPConfig.SignalingAddr = signalingAddr
