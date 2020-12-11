@@ -27,9 +27,9 @@ func (h *Handlers) Signaling(c *websocket.Conn) {
 	// It can publish the signaling data via "pub"
 	// Channels used for pubsub are "signaling_{base64_of_the_public_key}"
 
-	// pubKey is the base64 of the public key, same as stored in the DB
 	socketState := initState
 
+	// pubKey is the base64 of the public key, same as stored in the DB
 	pubKey := c.Query("pub_key")
 	if pubKey == "" {
 		c.Close()
@@ -91,7 +91,7 @@ func (h *Handlers) Signaling(c *websocket.Conn) {
 
 				return
 			}
-
+			c.WriteMessage(1, []byte("OK"))
 			socketState = authenticatedState
 
 			break
