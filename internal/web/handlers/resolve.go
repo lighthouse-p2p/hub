@@ -17,7 +17,7 @@ func (h *Handlers) ResolveNickName(ctx *fiber.Ctx) error {
 	var record models.DHT
 	tx := h.Cfg.Database.Model(&models.DHT{}).Where("nick_name = ?", nickName).First(&record)
 	if tx.Error != nil {
-		return ctx.Status(404).SendString("Not Found")
+		return ctx.Status(404).SendString("The requested peer isn't registered on the network")
 	}
 
 	return ctx.SendString(record.PubKey)

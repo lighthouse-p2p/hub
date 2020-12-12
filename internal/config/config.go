@@ -32,8 +32,7 @@ type Config struct {
 	}
 
 	HTTPConfig struct {
-		HTTPAddr      string
-		SignalingAddr string
+		HTTPAddr string
 	}
 
 	// ChainConfig is hardncoded for now
@@ -75,7 +74,6 @@ func (c *Config) LoadConfig() {
 	redisPassword, redisPasswordPresent := os.LookupEnv("REDIS_PASSWORD")
 
 	httpAddr, httpAddrPresent := os.LookupEnv("HTTP_ADDR")
-	signalingAddr, signalingAddrPresent := os.LookupEnv("SIGNALING_ADDR")
 
 	if !pgDBPresent ||
 		!pgUserPresent ||
@@ -85,7 +83,6 @@ func (c *Config) LoadConfig() {
 		!pgTLSPresent ||
 		!pgTimezonePresent ||
 		!httpAddrPresent ||
-		!signalingAddrPresent ||
 		!redisHostPresent ||
 		!redisPortPresent ||
 		!redisUserPresent ||
@@ -132,7 +129,6 @@ func (c *Config) LoadConfig() {
 	c.RedisConfig.Password = redisPassword
 
 	c.HTTPConfig.HTTPAddr = httpAddr
-	c.HTTPConfig.SignalingAddr = signalingAddr
 
 	c.ChainConfig.InitialCoins = 100
 	c.ChainConfig.Worth = 1
