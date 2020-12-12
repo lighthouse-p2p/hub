@@ -50,7 +50,7 @@ func (h *Handlers) Signaling(c *websocket.Conn) {
 		return
 	}
 
-	challange, err := utils.GenerateRandomStringURLSafe(32)
+	challange, err := utils.GenerateRandomStringURLSafe(256)
 	if err != nil {
 		log.Printf("%s\n", err)
 		c.Close()
