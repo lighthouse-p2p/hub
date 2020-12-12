@@ -26,6 +26,7 @@ func InitHTTP(cfg *config.Config) {
 	handlersInit := handlers.Handlers{Cfg: cfg}
 
 	v1Group := app.Group("/v1")
+	v1Group.Get("/coins", handlersInit.Coins)
 	v1Group.Post("/register", handlersInit.Register)
 	v1Group.Get("/resolve/:nickname", handlersInit.ResolveNickName)
 
