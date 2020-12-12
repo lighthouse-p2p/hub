@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"strconv"
 	"time"
 
 	"github.com/go-redis/redis/v8"
@@ -127,6 +128,16 @@ func (h *Handlers) Signaling(c *websocket.Conn) {
 			err = json.Unmarshal(msg, &signal)
 			if err != nil || signal.To == "" {
 				continue
+			}
+
+			if signal.Type == "c" {
+				mb, err := strconv.ParseFloat(signal.SDP, 8)
+				if err != nil {
+					continue
+				}
+
+				models.AddBlock(h.Cfg, signal.From, mb)
+				models.AddBlock(h.Cfg, signal.To, -mb)
 			}
 
 			channel := getRedisPSKey(signal.To)
