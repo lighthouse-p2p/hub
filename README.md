@@ -1,4 +1,4 @@
-<h1 align="center">Lighthouse 🕯 Hub</h1>
+<h1 align="center">Lighthouse Hub</h1>
 <p align="center">The DHT and BlockChain for Lighthouse p2p</p>
 
 ---
