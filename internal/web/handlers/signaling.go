@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"log"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/go-redis/redis/v8"
@@ -36,7 +37,7 @@ func (h *Handlers) Signaling(c *websocket.Conn) {
 	socketState := initState
 
 	// pubKey is the base64 of the public key, same as stored in the DB
-	pubKey := c.Query("pub_key")
+	pubKey := strings.ReplaceAll(c.Query("pub_key"), " ", "+")
 	if pubKey == "" {
 		c.Close()
 
