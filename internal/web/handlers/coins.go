@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/lighthouse-p2p/hub/internal/models"
@@ -9,7 +10,7 @@ import (
 
 // Coins returns the coins of a pub key
 func (h *Handlers) Coins(c *fiber.Ctx) error {
-	pubKey := c.Query("pub_key")
+	pubKey := strings.ReplaceAll(c.Query("pub_key"), " ", "+")
 	if pubKey == "" {
 		return c.SendStatus(400)
 	}
